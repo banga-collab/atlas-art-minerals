@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 60,
+      "memory": 1024,
+      "includeFiles": "{server.js,lib/**,admin/**,*.html,data/*.json,assets/js/**,assets/css/**}"
+    }
+  },
+  "routes": [
+    { "src": "^/(index\\.html)?$", "dest": "/api/index" },
+    { "src": "^/[^/]+\\.html$", "dest": "/api/index" },
+    { "src": "^/(admin|admin/)$", "dest": "/api/index" },
+    { "src": "^/api/(?!index$).*$", "dest": "/api/index" },
+    { "src": "^/(sitemap\\.xml|robots\\.txt)$", "dest": "/api/index" },
+    { "src": "^/assets/js/(products|settings|i18n|journal)\\.js$", "dest": "/api/index" },
+    { "src": "^/assets/css/custom\\.css$", "dest": "/api/index" },
+    { "src": "^/(data|lib|api)/.*$", "status": 404, "dest": "/404.html" },
+    { "src": "^/(server\\.js|render-start\\.js|render\\.yaml|package\\.json|export-static\\.js|ADMIN-GUIDE\\.md|design\\.md)$", "status": 404, "dest": "/404.html" },
+    { "handle": "filesystem" },
+    { "src": "^/(.*)$", "dest": "/api/index" }
+  ],
+  "ignoreCommand": "git log -1 --pretty=%B | grep -q \"\\[skip-deploy\\]\""
+}

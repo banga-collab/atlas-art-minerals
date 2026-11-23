@@ -9,6 +9,9 @@ const path = require("path");
 const crypto = require("crypto");
 
 const ROOT = __dirname;
+// Serverless mode (Vercel): files written by the admin are stored in GitHub through lib/vfs.js (see api/index.js)
+const SERVERLESS = !!process.env.GH_TOKEN;
+const SESSION_KEY = crypto.createHash("sha256").update("aam-session|" + (process.env.APP_SECRET || process.env.GH_TOKEN || "")).digest();
 const DATA = path.join(ROOT, "data");
 const PORT = Number(process.env.PORT) || 4321;
 const UPLOAD_DIR = path.join(ROOT, "assets", "products");
@@ -94,15 +97,27 @@ const sessions = new Map();           // sha256(token) -> { exp, uid }   (the ra
 try { Object.entries(JSON.parse(fs.readFileSync(SESSIONS_FILE, "utf8"))).forEach(([k, v]) => { if (v && v.exp > Date.now()) sessions.set(k, v); }); } catch (e) { /* first start */ }
 let sessTimer = null;
 function saveSessions() {
+  if (SERVERLESS) return;
   clearTimeout(sessTimer);
   sessTimer = setTimeout(() => { const o = {}; for (const [k, v] of sessions) if (v.exp > Date.now()) o[k] = v; try { fs.writeFileSync(SESSIONS_FILE, JSON.stringify(o)); } catch (e) { /* disk issue: sessions stay in memory */ } }, 200);
 }
 const _sessDelete = sessions.delete.bind(sessions);
 sessions.delete = k => { const r = _sessDelete(k); saveSessions(); return r; };
 const attempts = new Map();           // ip -> { n, until }
-function newSession(uid) { const t = crypto.randomBytes(32).toString("hex"); sessions.set(tokHash(t), { exp: Date.now() + SESSION_HOURS * 3600e3, uid }); saveSessions(); return t; }
+function signTok(body) { return crypto.createHmac("sha256", SESSION_KEY).update(body).digest("base64url"); }
+function newSession(uid) {
+  if (SERVERLESS) { const u = loadUsers().find(x => x.id === uid) || {}; const body = Buffer.from(JSON.stringify({ u: uid, e: Date.now() + SESSION_HOURS * 3600e3, v: u.sv || 0 })).toString("base64url"); return body + "." + signTok(body); }
+  const t = crypto.randomBytes(32).toString("hex"); sessions.set(tokHash(t), { exp: Date.now() + SESSION_HOURS * 3600e3, uid }); saveSessions(); return t; }
 function cookies(req) { const out = {}; (req.headers.cookie || "").split(";").forEach(c => { const i = c.indexOf("="); if (i > 0) out[c.slice(0, i).trim()] = decodeURIComponent(c.slice(i + 1).trim()); }); return out; }
 function currentUser(req) {
+  if (SERVERLESS) {
+    const t = String(cookies(req).aam_admin || ""), i = t.indexOf("."); if (i < 1) return null;
+    const body = t.slice(0, i), sig = t.slice(i + 1), good = signTok(body);
+    if (sig.length !== good.length || !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(good))) return null;
+    let d; try { d = JSON.parse(Buffer.from(body, "base64url").toString()); } catch (e) { return null; }
+    if (!d || d.e < Date.now()) return null;
+    const u = loadUsers().find(x => x.id === d.u); return u && (u.sv || 0) === d.v ? u : null;
+  }
   const t = cookies(req).aam_admin, h = t && tokHash(t), s = h && sessions.get(h);
   if (!s) return null; if (s.exp < Date.now()) { sessions.delete(h); return null; }
   return loadUsers().find(u => u.id === s.uid) || null;
@@ -350,7 +365,7 @@ async function api(req, res, url) {
   const user = currentUser(req);
   if (!user) return send(res, 401, { error: "Session expirée. Reconnectez-vous." });
   if (!allowed(user.role, url.pathname, req.method)) return send(res, 403, { error: "Votre rôle (" + ROLES[user.role] + ") ne permet pas cette action." });
-  if (req.method !== "GET") res.on("finish", () => { if (res.statusCode < 400) logActivity(user, activityLabel(url.pathname, req.method), url.searchParams.get("f") || ""); });
+  if (req.method !== "GET") { let logged = false; const logIt = code => { if (logged) return; logged = true; if (code < 400) logActivity(user, activityLabel(url.pathname, req.method), url.searchParams.get("f") || ""); }; res.on("aam-before-save", logIt); res.on("finish", () => logIt(res.statusCode)); }
   req.user = user;
 
   if (url.pathname === "/api/catalog" && req.method === "GET") return send(res, 200, loadCatalog());
@@ -413,11 +428,11 @@ async function api(req, res, url) {
     const b = await readBody(req, 10_000); const users = loadUsers(), me = users.find(u => u.id === user.id);
     if (!pwOk(me, b.current || "")) return send(res, 401, { error: "Mot de passe actuel incorrect." });
     if (String(b.next || "").length < 10) return send(res, 400, { error: "Le nouveau mot de passe doit faire au moins 10 caractères." });
-    me.salt = crypto.randomBytes(16).toString("hex"); me.hash = hashPw(b.next, me.salt); saveUsers(users);
+    me.salt = crypto.randomBytes(16).toString("hex"); me.hash = hashPw(b.next, me.salt); if (SERVERLESS) me.sv = (me.sv || 0) + 1; saveUsers(users);
     const t = cookies(req).aam_admin;
     for (const [k, s] of sessions) if (s.uid === me.id && k !== tokHash(t)) sessions.delete(k);
     if (me.id === "admin") { try { fs.unlinkSync(path.join(DATA, "PREMIER-MOT-DE-PASSE.txt")); } catch (e) { /* already gone */ } }
-    return send(res, 200, { ok: true });
+    return send(res, 200, { ok: true }, SERVERLESS ? { "Set-Cookie": sessionCookie(req, newSession(me.id), SESSION_HOURS * 3600) } : undefined);
   }
   if ((await apiPlus(req, res, url, user)) !== null) return;
   if ((await apiCms(req, res, url)) !== null) return;
@@ -811,17 +826,36 @@ function csv(rows) { return "﻿" + rows.map(r => r.map(csvCell).join(";")).join
 /* ---------- Statistics (cookie-free, aggregated per day) ---------- */
 const STATS_FILE = path.join(DATA, "stats.json");
 const stats = readJSON(STATS_FILE, { salt: crypto.randomBytes(8).toString("hex"), days: {} });
+if (SERVERLESS) stats.days = {};   // per-instance counter, merged into stats.json by flushStats()
 let statsDirty = false;
 function today() { return new Date().toISOString().slice(0, 10); }
 function dayRec(d) { return stats.days[d] || (stats.days[d] = { v: 0, u: 0, uh: [], p: {}, prod: {}, ref: {}, lang: {}, dev: {}, q: 0, nl: 0 }); }
 function inc(o, k, n) { if (!k) return; k = String(k).slice(0, 120); o[k] = (o[k] || 0) + (n || 1); }
-function flushStats() { if (!statsDirty) return; const keep = Object.keys(stats.days).sort().slice(-400); const d = {}; keep.forEach(k => d[k] = stats.days[k]); stats.days = d; writeJSON(STATS_FILE, stats); statsDirty = false; }
+function mergeStats(into, add) {
+  Object.entries(add.days || {}).forEach(([d, r]) => {
+    const t = into.days[d] || (into.days[d] = { v: 0, u: 0, uh: [], p: {}, prod: {}, ref: {}, lang: {}, dev: {}, q: 0, nl: 0 });
+    t.v += r.v || 0; t.q += r.q || 0; t.nl += r.nl || 0;
+    (r.uh || []).forEach(h => { if (!t.uh.includes(h) && t.uh.length < 20000) t.uh.push(h); }); t.u = Math.max(t.u + 0, t.uh.length);
+    ["p", "prod", "ref", "lang", "dev"].forEach(k => Object.entries(r[k] || {}).forEach(([a, n]) => { t[k][a] = (t[k][a] || 0) + n; }));
+  });
+}
+let lastStatsFlush = Date.now();
+function flushStats() {
+  if (!statsDirty) return;
+  if (SERVERLESS) {
+    const fresh = readJSON(STATS_FILE, { salt: stats.salt, days: {} }); fresh.days = fresh.days || {};
+    mergeStats(fresh, stats); const keep = Object.keys(fresh.days).sort().slice(-400), d = {}; keep.forEach(k => d[k] = fresh.days[k]); fresh.days = d;
+    writeJSON(STATS_FILE, fresh); stats.days = {}; statsDirty = false; lastStatsFlush = Date.now(); return;
+  }
+ const keep = Object.keys(stats.days).sort().slice(-400); const d = {}; keep.forEach(k => d[k] = stats.days[k]); stats.days = d; writeJSON(STATS_FILE, stats); statsDirty = false; }
 setInterval(flushStats, 60e3).unref();
 process.on("SIGINT", () => { flushStats(); process.exit(0); }); process.on("SIGTERM", () => { flushStats(); process.exit(0); });
 function statsReport(days) {
+  if (SERVERLESS) flushStats();
+  const src = SERVERLESS ? readJSON(STATS_FILE, { days: {} }) : stats;
   const out = { series: [], totals: { v: 0, u: 0, q: 0, nl: 0 }, pages: {}, products: {}, refs: {}, langs: {}, devices: {} };
   for (let i = days - 1; i >= 0; i--) {
-    const d = new Date(Date.now() - i * 864e5).toISOString().slice(0, 10), r = stats.days[d] || {};
+    const d = new Date(Date.now() - i * 864e5).toISOString().slice(0, 10), r = (src.days || {})[d] || {};
     out.series.push({ d, v: r.v || 0, u: r.u || 0, q: r.q || 0 });
     ["v", "u", "q", "nl"].forEach(k => out.totals[k] += r[k] || 0);
     [["p", "pages"], ["prod", "products"], ["ref", "refs"], ["lang", "langs"], ["dev", "devices"]].forEach(([a, b]) => Object.entries(r[a] || {}).forEach(([k, n]) => inc(out[b], k, n)));
@@ -1007,6 +1041,8 @@ async function apiPlus(req, res, url, user) {
   if (P === "/api/subscribers" && M === "GET") return send(res, 200, loadSubs());
   if (P === "/api/subscriber" && M === "DELETE") { const b = await readBody(req, 2000); writeJSON(SUBS_FILE, loadSubs().filter(s => s.email !== b.email)); return send(res, 200, { ok: true }); }
   /* Publish: rebuild the static site (deploy/) and push it to GitHub -> Vercel redeploys automatically */
+  if (SERVERLESS && P === "/api/publish" && M === "GET") return send(res, 200, { ready: true, serverless: true, remote: "https://github.com/" + require("./lib/vfs").repos().public, last: "", siteUrl: loadSite().siteUrl || "" });
+  if (SERVERLESS && P === "/api/publish" && M === "POST") { try { await require("./lib/vfs").deployNow(); return send(res, 200, { ok: true }); } catch (e) { return send(res, 500, { error: "Publication impossible : " + e.message }); } }
   if (P === "/api/publish" && M === "GET") {
     const dir = path.join(ROOT, "deploy"), cp = require("child_process");
     if (!fs.existsSync(path.join(dir, ".git"))) return send(res, 200, { ready: false });
@@ -1126,7 +1162,7 @@ async function apiPlus(req, res, url, user) {
       if (u.role === "admin" && b.role !== "admin" && users.filter(x => x.role === "admin").length < 2) return send(res, 400, { error: "Il faut garder au moins un administrateur." });
       u.role = b.role;
     }
-    if (b.password) { if (String(b.password).length < 10) return send(res, 400, { error: "Mot de passe : 10 caractères minimum." }); u.salt = crypto.randomBytes(16).toString("hex"); u.hash = hashPw(b.password, u.salt); for (const [k, s] of sessions) if (s.uid === u.id) sessions.delete(k); }
+    if (b.password) { if (String(b.password).length < 10) return send(res, 400, { error: "Mot de passe : 10 caractères minimum." }); if (SERVERLESS) u.sv = (u.sv || 0) + 1; u.salt = crypto.randomBytes(16).toString("hex"); u.hash = hashPw(b.password, u.salt); for (const [k, s] of sessions) if (s.uid === u.id) sessions.delete(k); }
     if (b.reset2fa) u.totp = "";
     saveUsers(users); return send(res, 200, { ok: true });
   }
@@ -1249,7 +1285,7 @@ loadUsers();
 if (!fs.existsSync(MENU_FILE)) { writeJSON(MENU_FILE, loadMenu()); applyMenus(); }
 writeI18nPublic(); autoBackup(false);
 
-http.createServer(async (req, res) => {
+async function handle(req, res) {
   const url = new URL(req.url, "http://localhost");
   try {
     if (url.pathname.startsWith("/api/")) return await api(req, res, url);
@@ -1259,4 +1295,7 @@ http.createServer(async (req, res) => {
     send(res, e.code === 413 ? 413 : e.code === 400 ? 400 : 500, { error: e.code === 413 ? "Fichier trop lourd." : e.code === 400 ? "Requête invalide." : "Erreur serveur." });
     if (!e.code) console.error(e);
   }
-}).listen(PORT, () => console.log("Atlas Art Minerals : http://localhost:" + PORT + "  ·  admin : http://localhost:" + PORT + "/admin/"));
+}
+module.exports = handle;
+module.exports.afterRequest = () => { if (statsDirty && (Date.now() - lastStatsFlush > 120e3)) flushStats(); };
+if (!SERVERLESS) http.createServer(handle).listen(PORT, () => console.log("Atlas Art Minerals : http://localhost:" + PORT + "  ·  admin : http://localhost:" + PORT + "/admin/"));

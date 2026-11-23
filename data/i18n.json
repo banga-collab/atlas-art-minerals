@@ -1,0 +1,15 @@
+{
+  "on": {
+    "en": true,
+    "fr": false,
+    "ar": false,
+    "es": false
+  },
+  "def": "en",
+  "texts": {
+    "fr": {}
+  },
+  "srcs": {
+    "fr": {}
+  }
+}

@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlas Art Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Figtree:wght@400;500&family=DM+Mono:wght@400;500&family=Josefin+Sans:wght@400;600;700&family=Karla:wght@400;500&family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@500;700;800&family=Instrument+Sans:wght@400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --page: oklch(0.96 0.008 70);
+    --page-ink: oklch(0.27 0.02 330);
+    --page-mute: oklch(0.50 0.02 330);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--page-ink);
+    font: 16px/1.5 "Instrument Sans", system-ui, sans-serif;
+  }
+  header.top {
+    max-width: 1320px; margin: 0 auto; padding: 40px 24px 8px;
+  }
+  header.top p.k { font: 500 12px/1 "DM Mono", monospace; letter-spacing: .12em; text-transform: uppercase; color: var(--page-mute); margin: 0 0 14px; }
+  header.top h1 { font: 700 clamp(26px, 3.4vw, 40px)/1.12 "Instrument Sans", sans-serif; margin: 0 0 10px; max-width: 30ch; letter-spacing: -.01em; }
+  header.top p.sub { margin: 0; color: var(--page-mute); max-width: 62ch; }
+  .grid {
+    max-width: 1320px; margin: 0 auto; padding: 28px 24px 56px;
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px;
+  }
+  @media (max-width: 1040px) { .grid { grid-template-columns: 1fr; } }
+  @media (max-width: 480px) { .grid, header.top { padding-left: 16px; padding-right: 16px; } }
+
+  .dir {
+    background: var(--bg); color: var(--ink);
+    border-radius: 6px; padding: 28px 26px 30px;
+    display: flex; flex-direction: column; gap: 22px;
+    position: relative;
+    outline: 1px solid color-mix(in oklch, var(--ink) 12%, transparent);
+  }
+  .dir .no { font-family: var(--f-util); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--soft); display:flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .badge { background: var(--accent); color: var(--on-accent); padding: 5px 9px; border-radius: 3px; font-weight: 500; letter-spacing: .1em; }
+  .dir h2 { margin: 0; font-family: var(--f-util); font-weight: 500; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+  .thesis { font-family: var(--f-display); margin: 0; }
+  .lede { font-family: var(--f-body); margin: 0; font-size: 17px; line-height: 1.55; max-width: 44ch; }
+  .util { font-family: var(--f-util); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--soft); margin: 0; }
+  .cta { align-self: flex-start; font-family: var(--f-body); font-weight: 500; background: var(--accent); color: var(--on-accent); padding: 12px 18px; border-radius: var(--radius); text-decoration: none; }
+  .cta:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+  .sw { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
+  .sw div { border-radius: 4px; overflow: hidden; outline: 1px solid color-mix(in oklch, var(--ink) 14%, transparent); background: color-mix(in oklch, var(--bg) 70%, var(--ink) 4%); }
+  .sw i { display: block; height: 56px; }
+  .sw b, .sw code { display: block; padding: 0 8px; font-family: var(--f-util); font-size: 10.5px; line-height: 1.5; }
+  .sw b { padding-top: 6px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; }
+  .sw code { padding-bottom: 7px; color: var(--soft); }
+  .fonts { font-family: var(--f-util); font-size: 12px; line-height: 1.8; margin: 0; color: var(--soft); }
+  .fonts span { color: var(--ink); }
+  .why { margin: 0; font-family: var(--f-body); font-size: 15px; border-top: 1px dashed color-mix(in oklch, var(--ink) 25%, transparent); padding-top: 16px; }
+  .why strong { font-weight: 500; }
+
+  /* 1 — Lit From Within */
+  .d1 {
+    --bg: oklch(0.95 0.022 62); --ink: oklch(0.28 0.035 340); --soft: oklch(0.50 0.04 335);
+    --accent: oklch(0.74 0.16 62); --on-accent: oklch(0.24 0.04 40);
+    --f-display: "Bricolage Grotesque", sans-serif; --f-body: "Figtree", sans-serif; --f-util: "DM Mono", monospace;
+    --radius: 999px;
+    background: radial-gradient(120% 70% at 70% 0%, oklch(0.97 0.035 70), var(--bg) 60%);
+  }
+  .d1 .thesis { font-weight: 800; font-size: clamp(30px, 3.2vw, 40px); line-height: 1.02; letter-spacing: -.025em; font-variation-settings: "opsz" 96; }
+
+  /* 2 — Hand-Inked Ridge */
+  .d2 {
+    --bg: oklch(0.93 0.012 105); --ink: oklch(0.24 0.02 150); --soft: oklch(0.47 0.025 140);
+    --accent: oklch(0.52 0.12 158); --on-accent: oklch(0.97 0.01 110);
+    --f-display: "Josefin Sans", sans-serif; --f-body: "Karla", sans-serif; --f-util: "IBM Plex Mono", monospace;
+    --radius: 2px;
+  }
+  .d2 .thesis { font-weight: 700; font-size: clamp(26px, 2.6vw, 33px); line-height: 1.12; text-transform: uppercase; letter-spacing: .08em; }
+  .ridge { display:block; width: 100%; height: 34px; color: var(--ink); }
+
+  /* 3 — Engraved Mauve */
+  .d3 {
+    --bg: oklch(0.86 0.025 325); --ink: oklch(0.27 0.05 320); --soft: oklch(0.44 0.05 320);
+    --accent: oklch(0.47 0.18 266); --on-accent: oklch(0.96 0.015 300);
+    --f-display: "Syne", sans-serif; --f-body: "Instrument Sans", sans-serif; --f-util: "Space Mono", monospace;
+    --radius: 0;
+    background-image: repeating-linear-gradient(45deg, color-mix(in oklch, var(--ink) 5%, transparent) 0 1px, transparent 1px 14px), repeating-linear-gradient(-45deg, color-mix(in oklch, var(--ink) 5%, transparent) 0 1px, transparent 1px 14px);
+  }
+  .d3 .thesis { font-weight: 800; font-size: clamp(28px, 2.9vw, 37px); line-height: 1.04; letter-spacing: -.01em; }
+
+  footer { max-width: 1320px; margin: 0 auto; padding: 0 24px 48px; color: var(--page-mute); font-size: 15px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <p class="k">Atlas Art Minerals · three directions</p>
+  <h1>Pick one: reply 1, 2 or 3.</h1>
+  <p class="sub">Each direction comes from your tealight photo or your logo, not from what other mineral shops look like. Each shows its palette, its three fonts with your thesis line, and the reason it fits.</p>
+</header>
+
+<main class="grid">
+
+  <section class="dir d1" aria-labelledby="h1">
+    <div class="no"><span>Direction 1</span><span class="badge">Recommended</span></div>
+    <h2 id="h1">Lit From Within</h2>
+    <p class="thesis">Moroccan selenite at the source: carved in Agadir, shipped to your shelves.</p>
+    <p class="lede">For over 30 years we've supplied hand-carved selenite and natural stone to distributors worldwide, in bulk and under your own label.</p>
+    <p class="util">MOQ 24 pcs · Ships from Agadir · Ref. SEL-THL-RND</p>
+    <a class="cta" href="#">Request trade prices</a>
+    <div class="sw">
+      <div><i style="background:oklch(0.95 0.022 62)"></i><b>bg · selenite milk</b><code>0.95 0.022 62</code></div>
+      <div><i style="background:oklch(0.28 0.035 340)"></i><b>ink · pot umber</b><code>0.28 0.035 340</code></div>
+      <div><i style="background:oklch(0.74 0.16 62)"></i><b>accent · flame</b><code>0.74 0.16 62</code></div>
+      <div><i style="background:oklch(0.80 0.055 72)"></i><b>raw wood</b><code>0.80 0.055 72</code></div>
+      <div><i style="background:oklch(0.62 0.04 320)"></i><b>carved mauve</b><code>0.62 0.04 320</code></div>
+    </div>
+    <p class="fonts">Display <span>Bricolage Grotesque</span><br>Body <span>Figtree</span><br>Utility <span>DM Mono</span></p>
+    <p class="why"><strong>Why:</strong> your photo is stone glowing on wood at dusk, so the whole site sits in that light. Selenite's milk-white is the page and the candle flame is the one bright colour.</p>
+  </section>
+
+  <section class="dir d2" aria-labelledby="h2">
+    <div class="no"><span>Direction 2</span></div>
+    <h2 id="h2">Hand-Inked Ridge</h2>
+    <svg class="ridge" viewBox="0 0 300 34" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30 L40 26 L70 12 L84 18 L104 4 L128 22 L150 16 L176 2 L204 20 L230 14 L246 22 L300 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/></svg>
+    <p class="thesis">Moroccan selenite at the source: carved in Agadir, shipped to your shelves.</p>
+    <p class="lede">For over 30 years we've supplied hand-carved selenite and natural stone to distributors worldwide, in bulk and under your own label.</p>
+    <p class="util">MOQ 24 pcs · Ships from Agadir · Ref. SEL-THL-RND</p>
+    <a class="cta" href="#">Request trade prices</a>
+    <div class="sw">
+      <div><i style="background:oklch(0.93 0.012 105)"></i><b>bg · limestone</b><code>0.93 0.012 105</code></div>
+      <div><i style="background:oklch(0.24 0.02 150)"></i><b>ink · ridge ink</b><code>0.24 0.02 150</code></div>
+      <div><i style="background:oklch(0.52 0.12 158)"></i><b>accent · cedar</b><code>0.52 0.12 158</code></div>
+      <div><i style="background:oklch(0.82 0.03 95)"></i><b>dust</b><code>0.82 0.03 95</code></div>
+      <div><i style="background:oklch(0.62 0.03 140)"></i><b>slope grey</b><code>0.62 0.03 140</code></div>
+    </div>
+    <p class="fonts">Display <span>Josefin Sans (caps, tracked)</span><br>Body <span>Karla</span><br>Utility <span>IBM Plex Mono</span></p>
+    <p class="why"><strong>Why:</strong> it builds on your logo. The hand-drawn Atlas ridge becomes the line that runs through the site, with cedar green from the mountains the stone comes from.</p>
+  </section>
+
+  <section class="dir d3" aria-labelledby="h3">
+    <div class="no"><span>Direction 3</span></div>
+    <h2 id="h3">Engraved Mauve</h2>
+    <p class="thesis">Moroccan selenite at the source: carved in Agadir, shipped to your shelves.</p>
+    <p class="lede">For over 30 years we've supplied hand-carved selenite and natural stone to distributors worldwide, in bulk and under your own label.</p>
+    <p class="util">MOQ 24 pcs · Ships from Agadir · Ref. SEL-THL-RND</p>
+    <a class="cta" href="#">Request trade prices</a>
+    <div class="sw">
+      <div><i style="background:oklch(0.86 0.025 325)"></i><b>bg · pot glaze</b><code>0.86 0.025 325</code></div>
+      <div><i style="background:oklch(0.27 0.05 320)"></i><b>ink · aubergine</b><code>0.27 0.05 320</code></div>
+      <div><i style="background:oklch(0.47 0.18 266)"></i><b>accent · kiln cobalt</b><code>0.47 0.18 266</code></div>
+      <div><i style="background:oklch(0.95 0.015 60)"></i><b>selenite</b><code>0.95 0.015 60</code></div>
+      <div><i style="background:oklch(0.76 0.07 80)"></i><b>straw</b><code>0.76 0.07 80</code></div>
+    </div>
+    <p class="fonts">Display <span>Syne</span><br>Body <span>Instrument Sans</span><br>Utility <span>Space Mono</span></p>
+    <p class="why"><strong>Why:</strong> it takes the carved lattice pot behind your candles, a crafted mauve with a fine diamond pattern, plus one deep cobalt for ordering. Most decorative, least expected.</p>
+  </section>
+
+</main>
+<footer>Thesis line used in all three: “Moroccan selenite at the source: carved in Agadir, shipped to your shelves.”</footer>
+</body>
+</html>

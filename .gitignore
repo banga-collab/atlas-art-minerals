@@ -1,0 +1,23 @@
+# private data: never in Git (lives on the server disk)
+data/*
+!data/catalog.json
+!data/site.json
+!data/journal.json
+!data/i18n.json
+!data/menu.json
+!data/redirects.json
+# local-only folders
+deploy/
+photos-upscaled/
+mockups/
+mockups2/
+design-concept/
+assets/brand/_old/
+assets/brand/concepts/
+assets/brand/concepts2/
+assets/brand/icon-variants/
+assets/brand/icons-v2/
+assets/brand/icons-v3/
+assets/brand/palettes/
+node_modules/
+.claude/

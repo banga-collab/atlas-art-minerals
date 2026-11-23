@@ -1,0 +1,96 @@
+{
+  "header": [
+    {
+      "href": "collection.html",
+      "label": {
+        "en": "Collection",
+        "fr": "Collection",
+        "ar": "المجموعة",
+        "es": "Colección"
+      }
+    },
+    {
+      "href": "workshop.html",
+      "label": {
+        "en": "Workshop",
+        "fr": "Atelier",
+        "ar": "الورشة",
+        "es": "Taller"
+      }
+    },
+    {
+      "href": "trade.html",
+      "label": {
+        "en": "Trade & private label",
+        "fr": "Trade & marque privée",
+        "ar": "التجارة والعلامة الخاصة",
+        "es": "Comercio y marca propia"
+      }
+    },
+    {
+      "href": "journal.html",
+      "label": {
+        "en": "Journal",
+        "fr": "Journal",
+        "ar": "المجلة",
+        "es": "Diario"
+      }
+    },
+    {
+      "href": "quote.html#contact",
+      "label": {
+        "en": "Contact",
+        "fr": "Contact",
+        "ar": "اتصل بنا",
+        "es": "Contacto"
+      }
+    }
+  ],
+  "footer": [
+    {
+      "href": "workshop.html",
+      "label": {
+        "en": "The workshop",
+        "fr": "L'atelier",
+        "ar": "الورشة",
+        "es": "El taller"
+      }
+    },
+    {
+      "href": "trade.html",
+      "label": {
+        "en": "Trade & private label",
+        "fr": "Trade & marque privée",
+        "ar": "التجارة والعلامة الخاصة",
+        "es": "Comercio y marca propia"
+      }
+    },
+    {
+      "href": "journal.html",
+      "label": {
+        "en": "Journal",
+        "fr": "Journal",
+        "ar": "المجلة",
+        "es": "Diario"
+      }
+    },
+    {
+      "href": "trade.html#faq",
+      "label": {
+        "en": "Questions",
+        "fr": "Questions",
+        "ar": "أسئلة",
+        "es": "Preguntas"
+      }
+    },
+    {
+      "href": "quote.html",
+      "label": {
+        "en": "Quote list",
+        "fr": "Liste de devis",
+        "ar": "قائمة الأسعار",
+        "es": "Lista de presupuesto"
+      }
+    }
+  ]
+}

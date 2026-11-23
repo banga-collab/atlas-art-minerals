@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Administration — Atlas Art Minerals</title>
+<link rel="icon" href="../assets/brand/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css?v=12">
+</head>
+<body>
+
+<!-- Connexion -->
+<main id="login" class="login" hidden>
+  <form id="login-form" class="login-card" novalidate>
+    <img class="login-logo" src="../assets/brand/atlas-art-logo-horizontal.svg" alt="Atlas Art Minerals" width="220" height="48">
+    <h1>Administration</h1>
+    <p class="muted">Atlas Art Minerals — gestion du site</p>
+    <label for="un">Identifiant</label>
+    <input id="un" name="username" autocomplete="username" value="admin" required>
+    <label for="pw">Mot de passe</label>
+    <input id="pw" name="password" type="password" autocomplete="current-password" required>
+    <div id="code-row" hidden><label for="code">Code de vérification (2FA)</label><input id="code" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></div>
+    <p class="err" id="login-err" role="alert"></p>
+    <button class="btn" type="submit">Se connecter</button>
+    <a class="back" href="../index.html">← Retour au site</a>
+  </form>
+</main>
+
+<!-- Application -->
+<div id="app" class="shell" hidden>
+  <aside class="side" id="side">
+    <div class="ws"><span class="ws-ico" aria-hidden="true"><img src="../assets/brand/atlas-art-app-icon.svg" alt=""></span><div><b>Atlas Art</b><small>atlas-art</small></div></div>
+    <p class="side-label">Espaces</p>
+    <div class="ws ws2"><span class="ws-globe" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/></svg></span><div><b>Atlas Art</b><small>Site web</small></div></div>
+    <a class="side-back" href="../index.html" target="_blank" rel="noopener">← Voir le site public</a>
+    <p class="side-label">Site web</p>
+    <nav class="side-nav" aria-label="Administration">
+      <a href="#/overview" data-view="overview" data-roles="admin editor sales"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/></svg>Vue d'ensemble</a>
+      <a href="#/leads" data-view="leads" data-roles="admin sales"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg>Demandes de devis <span class="pill" id="ld-pill" hidden>0</span></a>
+      <a href="#/stats" data-view="stats" data-roles="admin sales"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Statistiques</a>
+      <details open data-roles="admin editor">
+        <summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg>Gestion du contenu</summary>
+        <div class="sub">
+          <a href="#/articles" data-view="articles">Articles</a>
+          <a href="#/pages" data-view="pages">Pages</a>
+          <a href="#/products" data-view="products">Produits <span class="pill" id="count-pill">0</span></a>
+          <a href="#/import" data-view="import">Import Excel</a>
+          <a href="#/authors" data-view="authors">Auteurs</a>
+          <a href="#/categories" data-view="categories">Catégories</a>
+          <a href="#/menus" data-view="menus">Menus</a>
+          <a href="#/translations" data-view="translations">Traductions</a>
+        </div>
+      </details>
+      <details open data-roles="admin">
+        <summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>Apparence</summary>
+        <div class="sub">
+          <a href="#/templates" data-view="templates">Modèles</a>
+          <a href="#/customize" data-view="customize">Personnalisation du modèle</a>
+        </div>
+      </details>
+      <details open data-roles="admin editor">
+        <summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16-5-5-8 8"/></svg>Médias</summary>
+        <div class="sub">
+          <a href="#/assets" data-view="assets">Gérer les médias</a>
+          <a href="#/upload" data-view="upload">Téléverser un média</a>
+          <a href="#/engine" data-view="engine">Moteur d'images</a>
+        </div>
+      </details>
+      <details open data-roles="admin sales">
+        <summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11l18-7-7 18-2-8-9-3z"/></svg>Marketing</summary>
+        <div class="sub">
+          <a href="#/subscribers" data-view="subscribers" data-roles="admin sales">Abonnés newsletter</a>
+          <a href="#/seo" data-view="seo" data-roles="admin">SEO</a>
+        </div>
+      </details>
+      <a href="#/deployment" data-view="deployment" data-roles="admin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/></svg>Déploiement</a>
+      <details open data-roles="admin">
+        <summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M21.5 20c-.5-2.6-2-4.4-4-5.1"/></svg>Équipe</summary>
+        <div class="sub">
+          <a href="#/users" data-view="users">Utilisateurs</a>
+          <a href="#/activity" data-view="activity">Journal d'activité</a>
+        </div>
+      </details>
+    </nav>
+    <div class="side-foot">
+      <a href="#/account" data-view="account" data-roles="admin editor sales"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg><span id="me-name">Mon compte</span></a>
+      <a href="#/settings" data-view="settings" data-roles="admin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>Paramètres <span class="chev">›</span></a>
+      <button id="logout" type="button">Déconnexion</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="main-top">
+      <button class="side-toggle" id="side-toggle" type="button" aria-label="Ouvrir le menu" aria-controls="side" aria-expanded="false">☰</button>
+      <div><p class="crumb" id="view-crumb">Site web</p><h1 id="view-title">Vue d'ensemble</h1></div>
+      <a class="ghost" href="../index.html" target="_blank" rel="noopener">Voir le site ↗</a>
+    </header>
+
+
+  <!-- Demandes de devis -->
+  <section class="panel" id="tab-leads" role="region" aria-label="Demandes de devis" hidden>
+    <div class="bar">
+      <div class="filters">
+        <input id="ld-q" type="search" placeholder="Rechercher un nom, une société, un pays…" aria-label="Rechercher une demande">
+        <select id="ld-status" aria-label="Statut"><option value="">Tous les statuts</option><option value="new">Nouvelles</option><option value="progress">En cours</option><option value="quoted">Devis envoyé</option><option value="won">Gagnées</option><option value="lost">Perdues</option></select>
+      </div>
+      <a class="btn" href="/api/leads.csv" download>Exporter Excel</a>
+    </div>
+    <div class="ld-counts" id="ld-counts"></div>
+    <div class="ld-layout">
+      <div class="table-wrap"><table class="list"><thead><tr><th>Date</th><th>Client</th><th>Pays</th><th>Pièces</th><th>Statut</th></tr></thead><tbody id="ld-rows"></tbody></table>
+        <p class="empty" id="ld-empty" hidden>Aucune demande pour l'instant. Elles arrivent ici dès qu'un acheteur envoie sa liste depuis le site.</p></div>
+      <aside class="card ld-detail" id="ld-detail"><p class="muted">Sélectionnez une demande pour voir le détail.</p></aside>
+    </div>
+  </section>
+
+  <!-- Statistiques -->
+  <section class="panel" id="tab-stats" role="region" aria-label="Statistiques" hidden>
+    <div class="bar"><p class="muted" style="margin:0">Statistiques anonymes, sans cookies. Les visites de l'admin et des robots ne sont pas comptées.</p>
+      <select id="st-days" aria-label="Période"><option value="7">7 derniers jours</option><option value="30" selected>30 derniers jours</option><option value="90">90 derniers jours</option><option value="365">12 derniers mois</option></select></div>
+    <div class="ov-cards" id="st-kpis"></div>
+    <div class="card"><h2>Visites par jour</h2><div class="chart" id="st-chart" role="img" aria-label="Graphique des visites par jour"></div></div>
+    <div class="st-grid">
+      <div class="card"><h2>Pages les plus vues</h2><ol class="bars" id="st-pages"></ol></div>
+      <div class="card"><h2>Produits les plus consultés</h2><ol class="bars" id="st-products"></ol></div>
+      <div class="card"><h2>Sources des visites</h2><ol class="bars" id="st-refs"></ol></div>
+      <div class="card"><h2>Langues et pays (navigateur)</h2><ol class="bars" id="st-langs"></ol></div>
+      <div class="card"><h2>Appareils</h2><ol class="bars" id="st-devices"></ol></div>
+    </div>
+  </section>
+
+  <!-- Menus -->
+  <section class="panel" id="tab-menus" role="region" aria-label="Menus" hidden>
+    <p class="muted" style="margin:0 0 16px">Ajoutez, retirez et réordonnez les liens. Les libellés peuvent être traduits dans chaque langue. Les changements s'appliquent à toutes les pages.</p>
+    <div class="card"><h2>Menu principal (en-tête)</h2><div class="mn-head"><span>Anglais</span><span>Français</span><span>Arabe</span><span>Espagnol</span><span>Lien</span><span></span></div><ul class="mn-list" id="mn-header"></ul><button class="ghost" type="button" data-mn-add="header">+ Ajouter un lien</button></div>
+    <div class="card"><h2>Pied de page (colonne « Company »)</h2><div class="mn-head"><span>Anglais</span><span>Français</span><span>Arabe</span><span>Espagnol</span><span>Lien</span><span></span></div><ul class="mn-list" id="mn-footer"></ul><button class="ghost" type="button" data-mn-add="footer">+ Ajouter un lien</button></div>
+    <datalist id="mn-pages"><option value="index.html"><option value="collection.html"><option value="workshop.html"><option value="trade.html"><option value="trade.html#faq"><option value="journal.html"><option value="quote.html"><option value="quote.html#contact"><option value="legal.html"><option value="privacy.html"></datalist>
+    <div class="row-end"><button class="btn" type="button" id="mn-save">Enregistrer les menus</button></div>
+  </section>
+
+  <!-- Traductions -->
+  <section class="panel" id="tab-translations" role="region" aria-label="Traductions" hidden>
+    <div class="card">
+      <h2>Langues du site</h2>
+      <div class="row-gap" id="tr-langs"></div>
+      <p class="muted" style="margin:10px 0 0">La langue par défaut est l'anglais. Une langue activée apparaît dans le sélecteur du site. Les textes non traduits restent en anglais.</p>
+    </div>
+    <div class="bar">
+      <div class="filters">
+        <select id="tr-lang" aria-label="Langue à traduire"><option value="fr">Français</option><option value="ar">العربية (arabe)</option><option value="es">Español</option></select>
+        <select id="tr-page" aria-label="Page"></select>
+        <input id="tr-q" type="search" placeholder="Filtrer les textes…" aria-label="Filtrer">
+      </div>
+      <div class="row-gap"><span class="muted" id="tr-progress"></span><a class="ghost" id="tr-export" href="#">Exporter CSV</a><label class="ghost file">Importer CSV<input id="tr-import" type="file" accept=".csv,text/csv"></label><button class="btn" type="button" id="tr-save" disabled>Enregistrer</button></div>
+    </div>
+    <div class="table-wrap"><table class="list tr-table"><thead><tr><th style="width:44%">Texte original (anglais)</th><th>Traduction</th></tr></thead><tbody id="tr-rows"></tbody></table></div>
+  </section>
+
+  <!-- Abonnés newsletter -->
+  <section class="panel" id="tab-subscribers" role="region" aria-label="Abonnés" hidden>
+    <div class="bar"><p class="muted" style="margin:0" id="sb-count"></p><a class="btn" href="/api/subscribers.csv" download>Exporter Excel</a></div>
+    <div class="table-wrap"><table class="list"><thead><tr><th>Email</th><th>Date</th><th>Langue</th><th>Page d'inscription</th><th class="c-act"></th></tr></thead><tbody id="sb-rows"></tbody></table>
+      <p class="empty" id="sb-empty" hidden>Aucun abonné pour l'instant. Le formulaire est en bas de chaque page du site.</p></div>
+  </section>
+
+  <!-- SEO -->
+  <section class="panel" id="tab-seo" role="region" aria-label="SEO" hidden>
+    <div class="cust-grid">
+      <form class="card form" id="seo-form" novalidate>
+        <h2>Référencement global</h2>
+        <div class="field"><label for="seo-url">Adresse du site en ligne</label><input id="seo-url" placeholder="https://www.atlasart.com"><span class="muted small">Sert au plan du site, aux liens canoniques et aux partages.</span></div>
+        <div class="field"><label>Image de partage (réseaux sociaux, WhatsApp)</label>
+          <div class="row-gap"><div class="ph og" id="seo-og-ph"><img id="seo-og-img" alt=""></div><div class="row-gap"><button class="ghost" type="button" id="seo-og-lib">Médiathèque</button><button class="ghost" type="button" id="seo-og-rm">Retirer</button></div></div></div>
+        <div class="field"><label for="seo-gv">Code de vérification Google Search Console</label><input id="seo-gv" placeholder="ex. AbCdEf123…"></div>
+        <p class="muted small">Plan du site : <a href="/sitemap.xml" target="_blank" rel="noopener">/sitemap.xml</a> · Robots : <a href="/robots.txt" target="_blank" rel="noopener">/robots.txt</a></p>
+        <div class="row-end"><button class="btn" type="submit">Enregistrer</button></div>
+      </form>
+      <div class="card">
+        <h2>Redirections</h2>
+        <p class="muted">Redirigez les anciennes adresses (par exemple celles de l'ancien site atlasart.net) vers les nouvelles pages, pour ne pas perdre votre référencement.</p>
+        <ul class="rd-list" id="rd-list"></ul>
+        <div class="row-gap"><button class="ghost" type="button" id="rd-add">+ Ajouter une redirection</button><span class="spacer"></span><button class="btn" type="button" id="rd-save">Enregistrer</button></div>
+      </div>
+    </div>
+    <div class="card"><h2>Titres et descriptions des pages</h2><p class="muted">Pour les modifier, ouvrez la page dans « Pages » puis « Référencement Google de cette page ».</p>
+      <div class="table-wrap"><table class="list small"><thead><tr><th>Page</th><th>Titre Google</th><th>Description</th></tr></thead><tbody id="seo-pages"></tbody></table></div></div>
+  </section>
+
+  <!-- Utilisateurs -->
+  <section class="panel" id="tab-users" role="region" aria-label="Utilisateurs" hidden>
+    <div class="bar"><p class="muted" style="margin:0"><b>Administrateur</b> : tout. <b>Éditeur</b> : pages, articles, produits, médias, traductions, menus. <b>Commercial</b> : demandes de devis, statistiques, abonnés.</p><button class="btn" type="button" id="us-add">+ Nouvel utilisateur</button></div>
+    <div class="table-wrap"><table class="list"><thead><tr><th>Nom</th><th>Identifiant</th><th>Rôle</th><th>2FA</th><th>Dernière connexion</th><th class="c-act"></th></tr></thead><tbody id="us-rows"></tbody></table></div>
+  </section>
+
+  <!-- Mon compte (2FA) -->
+  <section class="panel" id="tab-account" role="region" aria-label="Mon compte" hidden>
+    <div class="card form narrow" id="tfa-card">
+      <h2>Double authentification (2FA)</h2>
+      <p class="muted" id="tfa-state"></p>
+      <div id="tfa-off"><p>Ajoutez un code à 6 chiffres à la connexion, généré par une application comme <b>Google Authenticator</b> ou <b>Microsoft Authenticator</b>.</p><button class="btn" type="button" id="tfa-start">Activer la 2FA</button></div>
+      <div id="tfa-setup" hidden>
+        <ol class="steps-mini"><li>Dans l'application, choisissez « Ajouter un compte » puis « Saisir une clé ».</li><li>Nom du compte : <b>Atlas Art</b>. Clé : <code id="tfa-secret"></code> (type : basée sur l'heure).</li><li>Saisissez le code à 6 chiffres affiché :</li></ol>
+        <div class="row-gap"><input id="tfa-code" inputmode="numeric" maxlength="6" placeholder="123456" aria-label="Code à 6 chiffres" style="max-width:140px"><button class="btn" type="button" id="tfa-confirm">Confirmer</button></div>
+      </div>
+      <div id="tfa-on" hidden><div class="field"><label for="tfa-pw">Mot de passe pour désactiver</label><input id="tfa-pw" type="password" autocomplete="current-password"></div><button class="danger" type="button" id="tfa-disable">Désactiver la 2FA</button></div>
+      <p class="err" id="tfa-err" role="alert"></p>
+    </div>
+  </section>
+
+  <!-- Journal d'activité -->
+  <section class="panel" id="tab-activity" role="region" aria-label="Journal d'activité" hidden>
+    <div class="bar"><div class="filters"><select id="ac-user" aria-label="Utilisateur"><option value="">Tous les utilisateurs</option></select><input id="ac-q" type="search" placeholder="Filtrer…" aria-label="Filtrer"></div></div>
+    <div class="table-wrap"><table class="list small"><thead><tr><th>Date</th><th>Utilisateur</th><th>Action</th><th>Détail</th></tr></thead><tbody id="ac-rows"></tbody></table></div>
+  </section>
+
+  <!-- Cookies (dans Paramètres) -->
+  <section class="panel" id="tab-cookies" role="region" aria-label="Bandeau cookies" hidden>
+    <form class="card form" id="ck-form" novalidate>
+      <h2>Bandeau cookies et statistiques</h2>
+      <label class="check"><input type="checkbox" id="ck-on"> Afficher le bandeau en bas du site (recommandé pour les visiteurs européens)</label>
+      <div class="field" style="margin-top:12px"><label for="ck-text">Texte du bandeau</label><input id="ck-text" maxlength="300"></div>
+      <p class="muted small">Les statistiques sont anonymes et sans cookies. Si un visiteur clique « Refuser », ses visites ne sont pas comptées. Vos propres visites, connecté à l'admin, ne le sont jamais.</p>
+      <div class="row-end"><button class="btn" type="submit">Enregistrer</button></div>
+    </form>
+    <form class="card form" id="ml-form" novalidate autocomplete="off">
+      <h2>Alertes email</h2>
+      <p class="muted">Recevez un email à chaque nouvelle demande de devis (avec « Répondre » directement au client), et envoyez un email de bienvenue avec lien de désinscription aux abonnés de la newsletter. Utilisez les réglages SMTP de votre messagerie (Gmail avec « mot de passe d'application », Outlook, Hostinger, OVH…).</p>
+      <p id="ml-state" class="small"></p>
+      <div class="grid2">
+        <div class="field"><label for="ml-host">Serveur SMTP</label><input id="ml-host" placeholder="smtp.gmail.com" maxlength="200"></div>
+        <div class="field"><label for="ml-port">Port <span class="muted">(587 ou 465)</span></label><input id="ml-port" inputmode="numeric" maxlength="5" placeholder="587"></div>
+        <div class="field"><label for="ml-user">Identifiant</label><input id="ml-user" maxlength="200" autocomplete="off"></div>
+        <div class="field"><label for="ml-pass">Mot de passe SMTP <span class="muted" id="ml-pass-hint"></span></label><input id="ml-pass" type="password" maxlength="300" autocomplete="new-password"></div>
+        <div class="field"><label for="ml-from">Adresse d'expédition</label><input id="ml-from" type="email" maxlength="200" placeholder="site@atlasart.com"></div>
+        <div class="field"><label for="ml-to">Recevoir les alertes sur <span class="muted">(une ou plusieurs adresses)</span></label><input id="ml-to" maxlength="200" placeholder="info@atlasart.com"></div>
+      </div>
+      <label class="check"><input type="checkbox" id="ml-leads"> Email à chaque nouvelle demande de devis</label>
+      <label class="check"><input type="checkbox" id="ml-welcome"> Email de bienvenue aux nouveaux abonnés</label>
+      <p class="err" id="ml-err" role="alert"></p>
+      <div class="row-gap"><button class="ghost" type="button" id="ml-test">Envoyer un email de test</button><span class="spacer"></span><button class="btn" type="submit">Enregistrer</button></div>
+    </form>
+  </section>
+
+  <!-- Vue d'ensemble -->
+  <section class="panel" id="tab-overview" role="region" aria-label="Vue d'ensemble">
+    <div class="ov-cards" id="ov-cards"></div>
+    <div class="ov-grid">
+      <div class="card"><h2>Actions rapides</h2><div class="quick">
+        <a class="qa" href="#/articles" data-new-article><b>+ Nouvel article</b><span>Publier une actualité dans le journal</span></a>
+        <a class="qa" href="#/products"><b>+ Nouveau produit</b><span>Ajouter une pièce au catalogue</span></a>
+        <a class="qa" href="#/pages"><b>Modifier une page</b><span>Textes, images, sections</span></a>
+        <a class="qa" href="#/upload"><b>Téléverser des photos</b><span>Ajouter à la médiathèque</span></a>
+      </div></div>
+      <div class="card"><h2>Activité récente</h2><ul class="activity" id="ov-activity"></ul></div>
+      <div class="card"><h2>À vérifier</h2><ul class="checks" id="ov-checks"></ul></div>
+    </div>
+  </section>
+
+  <!-- Articles (journal) -->
+  <section class="panel" id="tab-articles" role="region" aria-label="Articles" hidden>
+    <div id="art-list-view">
+      <div class="bar">
+        <div class="filters">
+          <input id="art-q" type="search" placeholder="Rechercher un article…" aria-label="Rechercher un article">
+          <select id="art-status" aria-label="Statut"><option value="">Tous les statuts</option><option value="published">Publiés</option><option value="draft">Brouillons</option></select>
+        </div>
+        <button class="btn" id="art-add" type="button">+ Nouvel article</button>
+      </div>
+      <div class="table-wrap"><table class="list">
+        <thead><tr><th class="c-img">Image</th><th>Titre</th><th>Catégorie</th><th>Auteur</th><th>Date</th><th>Statut</th><th class="c-act"><span class="sr-only">Actions</span></th></tr></thead>
+        <tbody id="art-rows"></tbody></table>
+        <p class="empty" id="art-empty" hidden>Aucun article pour l'instant. Cliquez « + Nouvel article ».</p></div>
+    </div>
+    <form id="art-form" class="art-edit" hidden novalidate>
+      <div class="bar">
+        <button class="ghost" type="button" id="art-back">← Tous les articles</button>
+        <span class="spacer"></span>
+        <button class="danger" type="button" id="art-del">Supprimer</button>
+        <button class="ghost" type="button" id="art-draft">Enregistrer en brouillon</button>
+        <button class="btn" type="submit" id="art-publish">Publier</button>
+      </div>
+      <div class="art-grid">
+        <div class="card">
+          <div class="field"><label for="a-title">Titre *</label><input id="a-title" maxlength="160" required><span class="err-s">Le titre est obligatoire.</span></div>
+          <div class="field"><label for="a-excerpt">Résumé <span class="muted">(affiché dans la liste du journal)</span></label><textarea id="a-excerpt" rows="2" maxlength="400"></textarea></div>
+          <label class="lbl">Contenu</label>
+          <div class="rt-bar" role="toolbar" aria-label="Mise en forme">
+            <button type="button" data-cmd="bold" title="Gras"><b>G</b></button>
+            <button type="button" data-cmd="italic" title="Italique"><i>I</i></button>
+            <button type="button" data-cmd="h2" title="Titre">Titre</button>
+            <button type="button" data-cmd="h3" title="Sous-titre">Sous-titre</button>
+            <button type="button" data-cmd="p" title="Paragraphe">¶</button>
+            <button type="button" data-cmd="ul" title="Liste">• Liste</button>
+            <button type="button" data-cmd="quote" title="Citation">❝</button>
+            <button type="button" data-cmd="link" title="Lien">🔗 Lien</button>
+            <button type="button" data-cmd="image" title="Image">🖼 Image</button>
+          </div>
+          <div class="rt" id="a-body" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Contenu de l'article"></div>
+          <input type="file" id="a-body-img" accept="image/webp,image/jpeg,image/png" hidden>
+        </div>
+        <div class="art-side">
+          <div class="card">
+            <div class="field"><label for="a-status">Statut</label><select id="a-status"><option value="draft">Brouillon</option><option value="published">Publié</option></select></div>
+            <div class="field"><label for="a-date">Date</label><input id="a-date" type="date"></div>
+            <div class="field"><label for="a-cat">Catégorie</label><select id="a-cat"></select></div>
+            <div class="field"><label for="a-author">Auteur</label><select id="a-author"></select></div>
+          </div>
+          <div class="card">
+            <label class="lbl">Image de couverture</label>
+            <div class="ph cover" id="a-cover-ph"><img id="a-cover-img" alt=""><span id="a-cover-none">Aucune image</span></div>
+            <div class="row-gap"><label class="ghost file">Choisir<input id="a-cover-file" type="file" accept="image/webp,image/jpeg,image/png"></label><button class="ghost" type="button" id="a-cover-lib">Médiathèque</button><button class="ghost" type="button" id="a-cover-rm">Retirer</button></div>
+          </div>
+          <div class="card">
+            <label class="lbl">Référencement Google</label>
+            <div class="field"><label for="a-seo-t">Titre SEO</label><input id="a-seo-t" maxlength="120"></div>
+            <div class="field"><label for="a-seo-d">Description SEO</label><textarea id="a-seo-d" rows="3" maxlength="300"></textarea></div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <!-- Auteurs -->
+  <section class="panel" id="tab-authors" role="region" aria-label="Auteurs" hidden>
+    <div class="bar"><p class="muted" style="margin:0">Les auteurs signent les articles du journal.</p><button class="btn" id="au-add" type="button">+ Nouvel auteur</button></div>
+    <div class="people-grid" id="au-list"></div>
+  </section>
+
+  <!-- Catégories -->
+  <section class="panel" id="tab-categories" role="region" aria-label="Catégories" hidden>
+    <div class="cat-grid">
+      <div class="card">
+        <h2>Catégories du journal</h2>
+        <p class="muted">Pour classer les articles (ex. Atelier, Nouveautés, Salons).</p>
+        <ul class="rows-edit" id="jc-list"></ul>
+        <div class="row-gap"><button class="ghost" type="button" id="jc-add">+ Ajouter une catégorie</button><span class="spacer"></span><button class="btn" type="button" id="jc-save">Enregistrer</button></div>
+      </div>
+      <div class="card">
+        <h2>Familles de produits</h2>
+        <p class="muted">Les familles du catalogue (filtres de la page Collection).</p>
+        <ul class="rows-edit" id="pf-list"></ul>
+        <div class="row-gap"><button class="ghost" type="button" id="pf-add">+ Ajouter une famille</button><span class="spacer"></span><button class="btn" type="button" id="pf-save">Enregistrer</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modèles -->
+  <section class="panel" id="tab-templates" role="region" aria-label="Modèles" hidden>
+    <p class="muted" style="margin:0 0 16px">Choisissez l'ambiance du site. Le changement s'applique à toutes les pages.</p>
+    <div class="tpl-grid" id="tpl-grid"></div>
+  </section>
+
+  <!-- Personnalisation -->
+  <section class="panel" id="tab-customize" role="region" aria-label="Personnalisation du modèle" hidden>
+    <div class="cust-grid">
+      <form class="card form" id="cust-form" novalidate>
+        <h2>Couleur d'accent</h2>
+        <p class="muted">Boutons « + Ajouter », badge du devis, soulignements.</p>
+        <div class="row-gap"><input type="color" id="c-accent" value="#c2622d" aria-label="Couleur d'accent"><input id="c-accent-hex" maxlength="7" aria-label="Code couleur" style="width:110px"><button class="ghost" type="button" id="c-accent-reset">Par défaut</button></div>
+        <h2>Police de caractères</h2>
+        <div class="field"><select id="c-font" aria-label="Police"><option value="manrope">Manrope (actuelle)</option><option value="figtree">Figtree</option><option value="instrument">Instrument Sans</option><option value="dmsans">DM Sans</option><option value="bricolage">Bricolage Grotesque</option></select></div>
+        <h2>Arrondi des coins</h2>
+        <div class="row-gap"><input type="range" id="c-radius" min="0" max="24" step="1" aria-label="Arrondi"><span id="c-radius-v" class="muted">6 px</span></div>
+        <h2>Bandeau du haut</h2>
+        <label class="check"><input type="checkbox" id="c-topbar"> Afficher le bandeau noir en haut du site</label>
+        <div class="row-end"><button class="btn" type="submit">Enregistrer</button></div>
+      </form>
+      <div class="card"><h2>Aperçu</h2><div class="cust-prev" id="cust-prev">
+        <div class="cp-top">TRADE ONLY · PRIVATE LABEL</div>
+        <div class="cp-body"><b class="cp-h">Moroccan selenite, made for great shops.</b><p>Hand-carved pieces for the trade.</p>
+        <span class="cp-btn">Browse the collection</span> <span class="cp-add">+ Add to list</span> <span class="cp-badge">3</span></div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- Médias -->
+  <section class="panel" id="tab-assets" role="region" aria-label="Gérer les médias" hidden>
+    <div class="bar">
+      <div class="filters">
+        <input id="as-q" type="search" placeholder="Rechercher un fichier…" aria-label="Rechercher un fichier">
+        <select id="as-folder" aria-label="Dossier"><option value="">Tous les dossiers</option><option value="products">Produits</option><option value="photos">Photos</option><option value="uploads">Médiathèque</option><option value="site">Site</option></select>
+        <select id="as-filter" aria-label="Filtre"><option value="">Tous</option><option value="unused">Non utilisés</option><option value="heavy">Lourds (+400 Ko)</option></select>
+      </div>
+      <a class="btn" href="#/upload">+ Téléverser</a>
+    </div>
+    <p class="muted" id="as-summary"></p>
+    <div class="as-grid" id="as-grid"></div>
+  </section>
+
+  <section class="panel" id="tab-upload" role="region" aria-label="Téléverser un média" hidden>
+    <div class="card">
+      <h2>Téléverser des images</h2>
+      <p class="muted">WEBP, JPG ou PNG, 5 Mo max chacune. Elles sont optimisées automatiquement par le moteur d'images, puis rangées dans la médiathèque.</p>
+      <label class="drop big" for="up-files" id="up-drop"><input id="up-files" type="file" accept="image/webp,image/jpeg,image/png" multiple><span>Glissez vos images ici ou cliquez pour choisir</span></label>
+      <ul class="up-list" id="up-list"></ul>
+    </div>
+  </section>
+
+  <section class="panel" id="tab-engine" role="region" aria-label="Moteur d'images" hidden>
+    <div class="cust-grid">
+      <form class="card form" id="eng-form" novalidate>
+        <h2>Réglages d'optimisation</h2>
+        <p class="muted">Appliqués à chaque image téléversée dans l'admin (produits, pages, articles, médiathèque).</p>
+        <div class="field"><label for="g-max">Largeur maximale (px)</label><input id="g-max" type="number" min="400" max="4000" step="100"></div>
+        <div class="field"><label for="g-q">Qualité (50–95)</label><div class="row-gap"><input id="g-q" type="range" min="50" max="95"><span id="g-q-v" class="muted"></span></div></div>
+        <label class="check"><input type="checkbox" id="g-webp"> Convertir en WebP (fichiers 25 à 35 % plus légers)</label>
+        <div class="row-end"><button class="btn" type="submit">Enregistrer</button></div>
+      </form>
+      <div class="card">
+        <h2>Optimiser les images existantes</h2>
+        <p class="muted" id="eng-info">Analyse en cours…</p>
+        <button class="btn" type="button" id="eng-run" disabled>Optimiser les images lourdes</button>
+        <ul class="up-list" id="eng-log"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Déploiement -->
+  <section class="panel" id="tab-deployment" role="region" aria-label="Déploiement" hidden>
+    <div class="ov-cards" id="dp-cards"></div>
+    <div class="ov-grid">
+      <div class="card"><h2>Mode maintenance</h2>
+        <p class="muted">Le site public affiche une page « Nous revenons bientôt ». Vous, connecté à l'admin, voyez toujours le site normalement.</p>
+        <label class="check"><input type="checkbox" id="mt-on"> Activer le mode maintenance</label>
+        <div class="field" style="margin-top:10px"><label for="mt-msg">Message affiché</label><input id="mt-msg" maxlength="300" placeholder="Our website is being updated…"></div>
+        <div class="row-end"><button class="btn" type="button" id="mt-save">Enregistrer</button></div>
+      </div>
+      <div class="card"><h2>Sauvegardes automatiques</h2>
+        <p class="muted">Une copie complète du contenu (produits, articles, devis, abonnés, traductions, menus) est faite chaque jour. Les 14 dernières sont gardées.</p>
+        <label class="check"><input type="checkbox" id="ab-on"> Sauvegarde automatique quotidienne</label>
+        <ul class="up-list" id="ab-list"></ul>
+        <div class="row-gap" style="margin-top:10px"><button class="ghost" type="button" id="ab-now">Sauvegarder maintenant</button><span class="spacer"></span><button class="btn" type="button" id="ab-save">Enregistrer</button></div>
+      </div>
+    </div>
+
+    <div class="card pub-card" id="pub-card"><h2>Publier le site en ligne</h2>
+      <p class="muted" id="pub-state">Vérification…</p>
+      <p class="muted small">Envoie la version actuelle du site public (produits, photos, textes, traductions, menus) vers GitHub ; Vercel le met en ligne en 1 minute environ. Rien de privé n'est envoyé (comptes, demandes, abonnés).</p>
+      <div class="row-gap"><button class="btn" type="button" id="pub-go">Publier maintenant</button><a class="ghost" id="pub-open" href="#" target="_blank" rel="noopener" hidden>Voir le site en ligne ↗</a></div>
+      <p class="err" id="pub-err" role="alert"></p>
+    </div>
+    <div class="ov-grid">
+      <div class="card"><h2>Sauvegardes</h2>
+        <p class="muted">Téléchargez une copie complète : produits, articles, textes de toutes les pages, traductions, menus, redirections, demandes de devis, abonnés, comptes et réglages. Les images restent dans le dossier <code>assets/</code> : copiez-le aussi.</p>
+        <div class="row-gap"><a class="btn" href="/api/export" download>Télécharger une sauvegarde</a>
+        <label class="ghost file">Restaurer une sauvegarde…<input id="dp-restore" type="file" accept=".json,application/json"></label></div>
+      </div>
+      <div class="card"><h2>Mise en ligne</h2>
+        <ul class="checks">
+          <li><b>Hébergement Node.js</b> (VPS, Hostinger Node, Render…). Commande : <code>node server.js</code></li>
+          <li><b>HTTPS</b> activé sur le domaine (ex. atlasart.com).</li>
+          <li><b>Disque persistant</b> pour <code>data/</code> et <code>assets/</code>.</li>
+          <li><b>Mot de passe</b> changé après la première connexion.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card"><h2>Versions des pages</h2>
+      <p class="muted">Une copie est créée avant chaque enregistrement. Restaurez une version en un clic.</p>
+      <div class="table-wrap"><table class="list small"><thead><tr><th>Page</th><th>Date</th><th>Taille</th><th class="c-act"></th></tr></thead><tbody id="dp-versions"></tbody></table>
+      <p class="empty" id="dp-none" hidden>Aucune version pour l'instant.</p></div>
+    </div>
+  </section>
+
+
+  <!-- Éditeur visuel -->
+  <section class="panel pe" id="tab-pages" role="region" aria-label="Pages" hidden>
+    <div class="pe-bar">
+      <label class="pe-sel">Page <select id="pe-page" aria-label="Page à modifier"></select></label>
+      <p class="pe-help muted">Cliquez sur un texte pour l'écrire, sur une image pour la remplacer. Les boutons « Masquer » cachent une section. Les textes en bleu au survol (menu, pied de page) changent sur toutes les pages.</p>
+      <span class="pe-dirty" id="pe-dirty">Aucune modification</span>
+      <button class="ghost" id="pe-undo" type="button" disabled>Annuler</button>
+      <button class="btn" id="pe-save" type="button" disabled>Enregistrer</button>
+    </div>
+    <details class="pe-seo">
+      <summary>Référencement Google de cette page (titre et description)</summary>
+      <div class="grid2">
+        <div class="field"><label for="pe-title">Titre de la page</label><input id="pe-title" maxlength="120"></div>
+        <div class="field"><label for="pe-desc">Description Google</label><input id="pe-desc" maxlength="300"></div>
+      </div>
+    </details>
+    <div class="pe-frame-wrap"><iframe id="pe-frame" title="Aperçu modifiable de la page"></iframe></div>
+  </section>
+
+  <!-- Produits -->
+  <section class="panel" id="tab-products" role="region" hidden>
+    <div class="bar">
+      <div class="filters">
+        <input id="q" type="search" placeholder="Rechercher un produit, une référence…" aria-label="Rechercher">
+        <select id="fam-filter" aria-label="Famille"></select>
+      </div>
+      <button class="btn" id="add" type="button">+ Ajouter un produit</button>
+    </div>
+    <div class="table-wrap">
+      <table class="list">
+        <thead><tr><th class="c-img">Photo</th><th>Nom</th><th>Famille</th><th>Matière</th><th>Réf.</th><th class="c-feat">Vedette</th><th class="c-act"><span class="sr-only">Actions</span></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <p class="empty" id="rows-empty" hidden>Aucun produit ne correspond.</p>
+    </div>
+  </section>
+
+  <!-- Import Excel -->
+  <section class="panel" id="tab-import" role="region" hidden>
+    <div class="card">
+      <h2>Importer vos produits depuis Excel, avec les photos</h2>
+      <p class="muted">Fichier <b>.xlsx</b> (recommandé), .xls ou .csv. Les en-têtes sur deux lignes (ex. <i>Product (cm)</i> › <i>Length</i>) et les cellules fusionnées sont reconnus. Les lignes qui ont le même <b>Nº</b> (ou le même nom) deviennent <b>un seul produit avec plusieurs tailles</b> (S, M, L…), chacune avec sa référence, son poids, ses dimensions et son emballage.</p>
+      <p class="muted"><b>Photos</b> : les images collées dans le fichier Excel sont récupérées automatiquement (une par ligne). Sinon, les liens des colonnes <i>Webp</i> / <i>Jpeg</i> sont téléchargés (Google Drive ou Dropbox : le fichier doit être partagé « tous les utilisateurs disposant du lien »). Toutes les photos sont optimisées comme les autres.</p>
+      <p><a href="modele-articles.csv" download>Télécharger un modèle simple</a></p>
+      <label class="drop" for="xl">
+        <input id="xl" type="file" accept=".xlsx,.xlsm,.xls,.csv">
+        <span>Choisir un fichier Excel…</span>
+      </label>
+      <p class="muted" id="xl-status" role="status"></p>
+      <p class="err" id="xl-err" role="alert"></p>
+    </div>
+    <div class="card" id="map-card" hidden>
+      <h2>Vérifier les colonnes</h2>
+      <p class="muted" id="map-info"></p>
+      <div class="map" id="map"></div>
+      <h3>Aperçu</h3>
+      <div class="table-wrap"><table class="list small" id="preview"></table></div>
+      <fieldset class="mode">
+        <legend>Que faire avec ces articles ?</legend>
+        <label><input type="radio" name="mode" value="add" checked> Ajouter au catalogue (les articles déjà présents avec la même référence ou le même nom sont mis à jour)</label>
+        <label><input type="radio" name="mode" value="replace"> Remplacer tout le catalogue par ce fichier</label>
+      </fieldset>
+      <label class="check" style="margin-bottom:14px"><input type="checkbox" id="xl-nophotos"> Ne pas importer les photos (textes et tailles seulement)</label>
+      <progress id="xl-progress" hidden></progress>
+      <button class="btn" id="do-import" type="button">Importer</button>
+      <div class="xl-failed" id="xl-failed" hidden></div>
+    </div>
+  </section>
+
+  <!-- Informations du site -->
+  <section class="panel" id="tab-site" role="region" hidden>
+    <form class="card form" id="site-form" novalidate>
+      <h2>Contact</h2>
+      <div class="grid2">
+        <div class="field"><label for="s-phone">Téléphone affiché</label><input id="s-phone" name="phone"></div>
+        <div class="field"><label for="s-whatsapp">Numéro WhatsApp <span class="muted">(chiffres, avec indicatif : 212…)</span></label><input id="s-whatsapp" name="whatsapp" inputmode="numeric"></div>
+        <div class="field"><label for="s-email">Email</label><input id="s-email" name="email" type="email"></div>
+        <div class="field"><label for="s-address">Adresse</label><input id="s-address" name="address"></div>
+      </div>
+      <h2>Chiffres affichés</h2>
+      <div class="grid2">
+        <div class="field"><label for="s-founded">Année de création</label><input id="s-founded" name="founded"></div>
+        <div class="field"><label for="s-customers">Clients</label><input id="s-customers" name="customers"></div>
+        <div class="field"><label for="s-companies">Entreprises fournies</label><input id="s-companies" name="companies"></div>
+        <div class="field"><label for="s-team">Équipe</label><input id="s-team" name="team"></div>
+        <div class="field"><label for="s-warehouses">Entrepôts</label><input id="s-warehouses" name="warehouses"></div>
+      </div>
+      <h2>Logo</h2>
+      <div class="logo-row">
+        <div class="logo-prev" id="logo-prev"><span class="logo" id="logo-preview"></span></div>
+        <div>
+          <label class="ghost file">Changer le logo<input id="logo-file" type="file" accept="image/png,image/webp"></label>
+          <p class="muted" style="margin:8px 0 0">PNG ou WEBP avec fond transparent (le logo est affiché en couleur foncée).</p>
+          <input type="hidden" name="logo" id="s-logo">
+        </div>
+      </div>
+      <h2>Bandeau du haut</h2>
+      <div class="field"><label for="s-topbar">Texte du bandeau</label><input id="s-topbar" name="topbar"></div>
+      <div class="row-end"><button class="btn" type="submit">Enregistrer</button></div>
+    </form>
+  </section>
+
+  <!-- Mot de passe -->
+  <section class="panel" id="tab-password" role="region" hidden>
+    <form class="card form narrow" id="pw-form" novalidate>
+      <h2>Changer le mot de passe</h2>
+      <div class="field"><label for="p-cur">Mot de passe actuel</label><input id="p-cur" name="current" type="password" autocomplete="current-password"></div>
+      <div class="field"><label for="p-new">Nouveau mot de passe <span class="muted">(10 caractères minimum)</span></label><input id="p-new" name="next" type="password" autocomplete="new-password"></div>
+      <div class="field"><label for="p-new2">Confirmer</label><input id="p-new2" name="next2" type="password" autocomplete="new-password"></div>
+      <p class="err" id="pw-err" role="alert"></p>
+      <div class="row-end"><button class="btn" type="submit">Changer</button></div>
+    </form>
+  </section>
+  </div>
+</div>
+
+<!-- Fiche produit -->
+<dialog id="edit" aria-labelledby="edit-title">
+  <form id="edit-form" method="dialog" novalidate>
+    <header><h2 id="edit-title">Produit</h2><a class="ghost" id="e-view" href="#" target="_blank" rel="noopener" hidden>Voir la page produit ↗</a><button class="x" type="button" data-close aria-label="Fermer">×</button></header>
+    <div class="edit-body">
+      <div class="photo">
+        <div class="ph" id="ph"><img id="ph-img" alt=""><span id="ph-none">Pas de photo</span></div>
+        <div class="e-gal" id="e-gal" aria-label="Photos du produit"></div>
+        <p class="muted small" style="margin:0">La 1re photo est la photo principale (liste, collection). Les autres s'affichent sur la page produit.</p>
+        <div class="e-gal-acts">
+          <label class="ghost file">+ Ajouter des photos<input id="ph-file" type="file" accept="image/webp,image/jpeg,image/png" multiple></label>
+          <button class="ghost" type="button" id="ph-lib">Médiathèque</button>
+          <button class="ghost" type="button" id="ph-link">Depuis un lien</button>
+        </div>
+        <div class="e-link" id="e-link" hidden>
+          <input id="e-link-url" type="url" placeholder="https://… (Webp, JPG, PNG, Google Drive, Dropbox)" aria-label="Lien de la photo">
+          <button class="btn" type="button" id="e-link-go">Récupérer</button>
+        </div>
+        <div class="field"><label for="e-bg">Type de photo</label>
+          <select id="e-bg" name="bg"><option value="white">Fond blanc (détouré)</option><option value="cloth">Fond gris / tissu</option><option value="scene">Mise en scène</option></select></div>
+      </div>
+      <div class="fields">
+        <div class="field"><label for="e-name">Nom *</label><input id="e-name" name="name" required maxlength="140"><span class="err-s">Le nom est obligatoire.</span></div>
+        <div class="grid2">
+          <div class="field"><label for="e-family">Famille</label><select id="e-family" name="family"></select></div>
+          <div class="field"><label for="e-finish">Matière</label><input id="e-finish" name="finish" list="finishes" maxlength="60"><datalist id="finishes"></datalist></div>
+          <div class="field"><label for="e-ref">Référence</label><input id="e-ref" name="ref" maxlength="60"></div>
+          <div class="field"><label for="e-sizes">Tailles / dimensions</label><input id="e-sizes" name="sizes" maxlength="200" placeholder="ex. S 6 cm · M 8 cm · L 10 cm"></div>
+        </div>
+        <div class="field"><label for="e-desc">Description</label><textarea id="e-desc" name="description" maxlength="1200" rows="4"></textarea></div>
+        <div class="field"><label for="e-long">Description longue <span class="muted">(fiche détaillée)</span></label><textarea id="e-long" maxlength="6000" rows="4"></textarea></div>
+        <div class="e-vars" id="e-vars" hidden></div>
+        <label class="check"><input type="checkbox" id="e-feat" name="featured"> Mettre en vedette sur la page d'accueil</label>
+      </div>
+    </div>
+    <footer>
+      <button class="danger" type="button" id="e-del">Supprimer</button>
+      <span class="spacer"></span>
+      <button class="ghost" type="button" data-close>Annuler</button>
+      <button class="btn" type="submit" id="e-save">Enregistrer</button>
+    </footer>
+  </form>
+</dialog>
+
+<!-- Photo d'une page -->
+<dialog id="pe-img" class="small-dlg" aria-labelledby="pi-title">
+  <header><h2 id="pi-title">Photo</h2><button class="x" type="button" data-close-img aria-label="Fermer">×</button></header>
+  <div class="pi-body">
+    <div class="ph"><img id="pi-prev" alt=""></div>
+    <div>
+      <label class="ghost file">Choisir une nouvelle photo<input id="pi-file" type="file" accept="image/webp,image/jpeg,image/png"></label>
+      <div class="field" style="margin-top:14px"><label for="pi-alt">Description de la photo <span class="muted">(pour Google et l'accessibilité)</span></label><input id="pi-alt" maxlength="200"></div>
+      <div class="field" id="pi-cap-row"><label for="pi-cap">Légende du diaporama</label><input id="pi-cap" maxlength="120"></div>
+    </div>
+  </div>
+  <footer><span class="spacer"></span><button class="ghost" type="button" data-close-img>Annuler</button><button class="btn" type="button" id="pi-ok">Appliquer</button></footer>
+</dialog>
+
+<!-- Diaporama -->
+<dialog id="pe-slides" class="small-dlg" aria-labelledby="ps-title">
+  <header><h2 id="ps-title">Diaporama de l'accueil</h2><button class="x" type="button" data-close-slides aria-label="Fermer">×</button></header>
+  <ul class="ps-list" id="ps-list"></ul>
+  <footer><p class="muted" style="margin:0">Les changements s'appliquent quand vous cliquez « Enregistrer » en haut.</p><span class="spacer"></span><button class="btn" type="button" data-close-slides>Terminé</button></footer>
+</dialog>
+
+<!-- Utilisateur -->
+<dialog id="us-dlg" class="small-dlg" aria-labelledby="us-title">
+  <form id="us-form" novalidate>
+    <header><h2 id="us-title">Utilisateur</h2><button class="x" type="button" data-close-us aria-label="Fermer">×</button></header>
+    <div class="pi-body" style="grid-template-columns:1fr">
+      <div class="grid2">
+        <div class="field"><label for="us-name">Nom affiché</label><input id="us-name" maxlength="80"></div>
+        <div class="field"><label for="us-username">Identifiant de connexion</label><input id="us-username" maxlength="40" autocomplete="off"></div>
+        <div class="field"><label for="us-role">Rôle</label><select id="us-role"><option value="editor">Éditeur</option><option value="sales">Commercial</option><option value="admin">Administrateur</option></select></div>
+        <div class="field"><label for="us-pw">Mot de passe <span class="muted" id="us-pw-hint">(10 caractères minimum)</span></label><input id="us-pw" type="text" autocomplete="off"></div>
+      </div>
+      <label class="check" id="us-2fa-row" hidden><input type="checkbox" id="us-reset2fa"> Réinitialiser sa double authentification (téléphone perdu)</label>
+      <p class="err" id="us-err" role="alert"></p>
+    </div>
+    <footer><button class="danger" type="button" id="us-del">Supprimer</button><span class="spacer"></span><button class="ghost" type="button" data-close-us>Annuler</button><button class="btn" type="submit">Enregistrer</button></footer>
+  </form>
+</dialog>
+
+<!-- Auteur -->
+<dialog id="au-dlg" class="small-dlg" aria-labelledby="au-title">
+  <form id="au-form" novalidate>
+    <header><h2 id="au-title">Auteur</h2><button class="x" type="button" data-close-au aria-label="Fermer">×</button></header>
+    <div class="pi-body">
+      <div class="photo"><div class="ph round" id="au-ph"><img id="au-img" alt=""><span id="au-none">Photo</span></div>
+        <label class="ghost file">Choisir une photo<input id="au-file" type="file" accept="image/webp,image/jpeg,image/png"></label></div>
+      <div>
+        <div class="field"><label for="au-name">Nom *</label><input id="au-name" maxlength="80"><span class="err-s">Le nom est obligatoire.</span></div>
+        <div class="field"><label for="au-role">Rôle</label><input id="au-role" maxlength="80" placeholder="ex. Co-fondateur"></div>
+        <div class="field"><label for="au-bio">Biographie courte</label><textarea id="au-bio" rows="4" maxlength="600"></textarea></div>
+      </div>
+    </div>
+    <footer><button class="danger" type="button" id="au-del">Supprimer</button><span class="spacer"></span><button class="ghost" type="button" data-close-au>Annuler</button><button class="btn" type="submit">Enregistrer</button></footer>
+  </form>
+</dialog>
+
+<!-- Médiathèque (choisir une image existante) -->
+<dialog id="lib-dlg" class="small-dlg wide" aria-labelledby="lib-title">
+  <header><h2 id="lib-title">Choisir dans la médiathèque</h2><button class="x" type="button" data-close-lib aria-label="Fermer">×</button></header>
+  <div class="lib-body"><input id="lib-q" type="search" placeholder="Rechercher…" aria-label="Rechercher une image"><div class="as-grid pick" id="lib-grid"></div></div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="admin.js?v=13"></script>
+<script src="editor.js?v=3"></script>
+<script src="cms.js?v=5"></script>
+<script src="plus.js?v=6"></script>
+</body>
+</html>

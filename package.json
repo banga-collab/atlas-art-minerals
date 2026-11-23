@@ -1,0 +1,12 @@
+{
+  "name": "atlas-art-minerals",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Atlas Art Minerals — site and admin (no dependencies)",
+  "scripts": {
+    "start": "node render-start.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

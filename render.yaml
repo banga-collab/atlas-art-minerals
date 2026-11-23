@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: atlas-art
+    runtime: node
+    plan: starter
+    region: frankfurt
+    buildCommand: "node --version"
+    startCommand: "node render-start.js"
+    healthCheckPath: /robots.txt
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: TRUST_PROXY
+        value: "1"
+      - key: SITE_ROOT
+        value: /var/data/site
+      - key: ADMIN_PASSWORD
+        sync: false
+    disk:
+      name: atlas-data
+      mountPath: /var/data
+      sizeGB: 1

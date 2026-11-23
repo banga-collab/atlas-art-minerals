@@ -19,7 +19,15 @@ async function getApp() {
 module.exports = async (req, res) => {
   if (!vfs.enabled) { res.statusCode = 500; res.setHeader("Content-Type", "text/plain; charset=utf-8"); return res.end("Configuration manquante : GH_TOKEN, PUBLIC_REPO et PRIVATE_REPO doivent être définis dans Vercel."); }
   try { await vfs.refresh(); } catch (e) { console.error("[vfs] refresh", e.message); }
-  const handle = await getApp();
+  let handle;
+  try { handle = await getApp(); } catch (e) {
+    console.error("[vfs] start", e.message);
+    res.statusCode = 503; res.setHeader("Content-Type", "text/html; charset=utf-8"); res.setHeader("Retry-After", "60");
+    const hint = e.status === 404 || e.status === 403 || e.status === 401
+      ? "La clé GitHub (GH_TOKEN) n'a pas accès aux dépôts. Dans GitHub › Settings › Developer settings › Fine-grained tokens, donnez-lui l'accès à " + vfs.repos().public + " et " + vfs.repos().private + " avec « Contents : Read and write »."
+      : "Connexion à GitHub impossible pour le moment. Réessayez dans une minute.";
+    return res.end('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Atlas Art Minerals</title><body style="font:16px/1.6 system-ui;background:#f7f3ec;color:#1a1918;display:grid;place-items:center;min-height:100vh;margin:0;padding:24px"><main style="max-width:560px"><h1 style="font-size:22px">Le site redémarre…</h1><p>' + hint.replace(/</g, "&lt;") + "</p></main></body>");
+  }
   const writes = req.method !== "GET" && req.method !== "HEAD";
   // hold the response of a save until GitHub has the commit, so an error can still be reported
   const orig = { writeHead: res.writeHead.bind(res), write: res.write.bind(res), end: res.end.bind(res), setHeader: res.setHeader.bind(res) };
